@@ -2,6 +2,7 @@ name: Enforce Fast-Forward and Merge Order
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened]
     branches:
       - '8.x'
 
