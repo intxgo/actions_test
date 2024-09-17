@@ -25,7 +25,7 @@ jobs:
           # Get the list of commits in the backport branch
           # It should be only one, since we always squash
           # anyway if someone tries to add something it'll land on the top
-          backport_commits=$(git rev-list HEAD --max-count=1)
+          backport_commits=$(git rev-list HEAD --max-count=10)
           echo "backport commits:\n $backport_commits"
 
           # Check if the commits in the backport branch are in main branch
