@@ -19,10 +19,14 @@ jobs:
           git fetch origin main
 
           # Get the list of commits in the main branch
-          main_commits=$(git rev-list origin/main)
+          main_commits=$(git rev-list origin/main --max-count=100)
+          echo "main commits:\n $main_commits"
 
           # Get the list of commits in the backport branch
-          backport_commits=$(git rev-list HEAD)
+          # It should be only one, since we always squash
+          # anyway if someone tries to add something it'll land on the top
+          backport_commits=$(git rev-list HEAD --max-count=1)
+          echo "backport commits:\n $backport_commits"
 
           # Check if the commits in the backport branch are in main branch
           for commit in $backport_commits; do
