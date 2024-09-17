@@ -1,0 +1,44 @@
+name: Enforce Fast-Forward and Merge Order
+
+on:
+  pull_request:
+    branches:
+      - '8.x'
+
+jobs:
+  check-merge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check if fast-forward merge is possible
+        run: |
+          git fetch origin main
+          if git merge-base --is-ancestor origin/main HEAD; then
+            echo "Fast-forward merge is possible"
+          else
+            echo "Fast-forward merge is not possible"
+            exit 1
+          fi
+
+      - name: Check merge order
+        run: |
+          # Fetch the latest commits from the main branch
+          git fetch origin main
+
+          # Get the list of commits in the main branch
+          main_commits=$(git rev-list origin/main)
+
+          # Get the list of commits in the backport branch
+          backport_commits=$(git rev-list HEAD)
+
+          # Check if the commits in the backport branch are in main branch
+          for commit in $backport_commits; do
+            if ! echo "$main_commits" | grep -q "$commit"; then
+              echo "Commit $commit is not in the main branch"
+              exit 1
+            fi
+          done
+
+          echo "All commits are validated. PR is ready for fast-forward merge"
