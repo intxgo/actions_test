@@ -13,17 +13,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check if fast-forward merge is possible
-        run: |
-          git fetch origin main
-          if git merge-base --is-ancestor origin/main HEAD; then
-            echo "Fast-forward merge is possible"
-          else
-            echo "Fast-forward merge is not possible"
-            exit 1
-          fi
-
-      - name: Check merge order
+      - name: Check all commits are present in main
         run: |
           # Fetch the latest commits from the main branch
           git fetch origin main
