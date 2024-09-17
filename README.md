@@ -5,3 +5,5 @@
 - test 2: automerge
 
 - test 3
+
+- test 4
