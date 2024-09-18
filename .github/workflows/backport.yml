@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Backport Action
-        uses: intxgo/backport-github-action@57cfc20d9d51f7816f9fe5003cff93cb883185d8 # v9.5.1_with_auto_merge
+        uses: intxgo/backport-github-action@6ec1b0f4c4a7ce95440093a914a6cb878f5c13dc # v9.5.1_with_auto_merge
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           auto_backport_label_prefix: backport-
