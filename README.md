@@ -17,3 +17,5 @@
 - test 8: new automerge
 
 - test 9
+
+- test 10
