@@ -21,11 +21,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Backport Action
-        uses: sorenlouv/backport-github-action@ad888e978060bc1b2798690dd9d03c4036560947 # v9.5.1
+        uses: intxgo/backport-github-action@57cfc20d9d51f7816f9fe5003cff93cb883185d8 # v9.5.1_with_auto_merge
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           auto_backport_label_prefix: backport-
           add_original_reviewers: true
+          auto_merge: true
 
       - name: Info log
         if: ${{ success() }}
