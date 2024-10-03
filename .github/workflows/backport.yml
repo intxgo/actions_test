@@ -2,7 +2,10 @@ name: backport
 
 on:
   pull_request_target:
-    types: ["labeled", "closed"]
+    branches:
+      - 8.x
+    types:
+      - opened
 
 permissions:
   contents: write
@@ -10,28 +13,34 @@ permissions:
 
 jobs:
   backport:
-    name: Backport PR to 8.x
-    if: |
-      github.event.pull_request.merged == true
-      && contains(github.event.pull_request.labels.*.name, 'backport-8.x')
-      && (
-        (github.event.action == 'labeled' && github.event.label.name == 'backport-8.x')
-        || (github.event.action == 'closed')
-      )
+    name: Merge backport PR to 8.x
     runs-on: ubuntu-latest
+    if: |
+      startsWith(github.event.pull_request.head.ref, 'backport') &&
+      github.event.pull_request.user.login == 'elastic-endpoint-team'
     steps:
-      - name: Backport Action
-        uses: intxgo/backport-github-action@6ec1b0f4c4a7ce95440093a914a6cb878f5c13dc # v9.5.1_with_auto_merge
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          auto_backport_label_prefix: backport-
-          add_original_reviewers: true
-          auto_merge: true
+      - name: Get Pull Request Number
+        id: get_pr_number
+        run: echo "PR_NUMBER=$(jq --raw-output .pull_request.number $GITHUB_EVENT_PATH)" >> $GITHUB_ENV
 
-      - name: Info log
-        if: ${{ success() }}
-        run: cat ~/.backport/backport.info.log
+      - name: Mask GitHub Token
+        run: |
+          echo "::add-mask::${{ secrets.GITHUB_TOKEN }}"
+          echo "${{ secrets.GITHUB_TOKEN }}"
 
-      - name: Debug log
-        if: ${{ failure() }}
-        run: cat ~/.backport/backport.debug.log
+      - name: Merge Pull Request
+        run: |
+          curl -L \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}/merge \
+            -d '{"merge_method":"merge"}'
+            curl -L \
+            -X PUT \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ::add-mask::${{ secrets.GITHUB_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}/merge \
+            -d '{"merge_method":"merge"}'
