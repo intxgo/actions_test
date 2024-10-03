@@ -15,9 +15,6 @@ jobs:
   backport:
     name: Merge backport PR to 8.x
     runs-on: ubuntu-latest
-    if: |
-      startsWith(github.event.pull_request.head.ref, 'backport') &&
-      github.event.pull_request.user.login == 'elastic-endpoint-team'
     steps:
       - name: Get Pull Request Number
         id: get_pr_number
