@@ -13,31 +13,20 @@ permissions:
 
 jobs:
   backport:
-    name: Merge backport PR to 8.x
+    name: Backport PR to 8.x
+    if: |
+      github.event.pull_request.merged == true
+      && contains(join(github.event.pull_request.labels.*.name, ','), 'backport-')
+      && (
+        (github.event.action == 'labeled' && github.event.label.name == 'backport-8.x')
+        || (github.event.action == 'closed')
+      )
     runs-on: ubuntu-latest
     steps:
-      - name: Get Pull Request Number
-        id: get_pr_number
-        run: echo "PR_NUMBER=$(jq --raw-output .pull_request.number $GITHUB_EVENT_PATH)" >> $GITHUB_ENV
-
-      - name: Mask GitHub Token
-        run: |
-          echo "::add-mask::${{ secrets.GITHUB_TOKEN }}"
-          echo "${{ secrets.GITHUB_TOKEN }}"
-
-      - name: Merge Pull Request
-        run: |
-          curl -L \
-            -X PUT \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}/merge \
-            -d '{"merge_method":"merge"}'
-            curl -L \
-            -X PUT \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ::add-mask::${{ secrets.GITHUB_TOKEN }}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            https://api.github.com/repos/${{ github.repository }}/pulls/${{ env.PR_NUMBER }}/merge \
-            -d '{"merge_method":"merge"}'
+      - name: Backport Action
+        uses: intxgo/backport-github-action@d890e7ab6e064fa3ca0800f0e5eec3ea673175cd # v9.5.1_with_auto_merge
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          auto_backport_label_prefix: backport-
+          add_original_reviewers: true
+          auto_merge: true
