@@ -13,7 +13,7 @@ jobs:
     name: Backport PR to 8.x
     if: |
       github.event.pull_request.merged == true
-      && contains(github.event.pull_request.labels.*.name, 'backport-8.x')
+      && contains(join(github.event.pull_request.labels.*.name, ','), 'backport-')
       && (
         (github.event.action == 'labeled' && github.event.label.name == 'backport-8.x')
         || (github.event.action == 'closed')
