@@ -29,3 +29,5 @@
 - test r2
 
 - test dm1
+
+- test dm2
