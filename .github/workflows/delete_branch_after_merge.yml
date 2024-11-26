@@ -1,0 +1,23 @@
+name: Delete Branch After Merge
+
+on:
+  pull_request:
+    types: [closed]
+
+jobs:
+  delete_branch:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mask GitHub Token
+        # this step ensures that the token will be redacted on the runner view
+        run: echo "::add-mask::${{ secrets.GITHUB_TOKEN }}"
+
+      - name: Delete branch
+        run: |
+          branch=${{ github.event.pull_request.head.ref }}
+          owner=${{ github.repository_owner }}
+          repo=${{ github.event.repository.name }}
+          token=${{ secrets.GITHUB_TOKEN }}
+          curl -X DELETE -H "Authorization: Bearer $token" \
+            https://api.github.com/repos/$owner/$repo/git/refs/heads/$branch

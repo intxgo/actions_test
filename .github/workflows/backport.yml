@@ -10,24 +10,22 @@ permissions:
 
 jobs:
   backport:
-    name: Backport PR to 8.x
+    name: Backport PR to branch specified by pr label(s) 'backport-[branch name]'
     if: |
       github.event.pull_request.merged == true
       && contains(join(github.event.pull_request.labels.*.name, ','), 'backport-')
       && (
-        (github.event.action == 'labeled' && github.event.label.name == 'backport-8.x')
+        (github.event.action == 'labeled' && startsWith(github.event.label.name, 'backport-'))
         || (github.event.action == 'closed')
       )
     runs-on: ubuntu-latest
     steps:
       - name: Backport Action
-        uses: intxgo/backport-github-action@d890e7ab6e064fa3ca0800f0e5eec3ea673175cd # v9.5.1_with_auto_merge
+        uses: sorenlouv/backport-github-action@ad888e978060bc1b2798690dd9d03c4036560947 # v9.5.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           auto_backport_label_prefix: backport-
           add_original_reviewers: true
-          auto_merge: true
-
       - name: Info log
         if: ${{ success() }}
         run: cat ~/.backport/backport.info.log
