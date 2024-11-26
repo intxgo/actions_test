@@ -33,3 +33,4 @@
 - test dm2
 
 - test del
+- test del
