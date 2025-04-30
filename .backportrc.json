@@ -1,0 +1,5 @@
+{
+    "repoOwner": "intxgo",
+    "repoName": "actions_test",
+    "targetPRLabels": ["backport"]
+  }
