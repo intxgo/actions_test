@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Backport Action
+        id: backport # Give the step an ID to reference its outputs
         uses: sorenlouv/backport-github-action@ad888e978060bc1b2798690dd9d03c4036560947 # v9.5.1
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -33,3 +34,14 @@ jobs:
       - name: Debug log
         if: ${{ failure() }}
         run: cat ~/.backport/backport.debug.log
+
+      - name: Add Specific Labels to Backport PR
+        # Only run if the backport step successfully created a PR
+        if: steps.backport.outputs.backport_pull_request_number != ''
+        uses: actions-ecosystem/action-add-labels@v1 # Example labelling action
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          number: ${{ steps.backport.outputs.backport_pull_request_number }}
+          labels: | # Your desired arbitrary labels
+            my-custom-label
+            auto-backport
